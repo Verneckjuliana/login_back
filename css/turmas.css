@@ -1,0 +1,59 @@
+/* styles.css */
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Estilizar o formulário */
+form {
+    width: 300px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #ffe6e6; /* Cor de fundo em tons de rosa */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra leve */
+    text-align: left; /* Centralizar conteúdo interno */
+}
+
+/* Estilizar o título */
+h1 {
+    margin: 0; /* Remover margens */
+    margin-bottom: 20px; /* Adicionar margem inferior para separação */
+}
+
+/* Estilizar os rótulos */
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Estilizar os campos de entrada */
+input[type="text"] {
+    width: calc(100% - 20px); /* Definir largura do input ajustada para compensar o padding do formulário */
+    padding: 7px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Estilizar o botão de envio */
+input[type="submit"] {
+    width: calc(100% - 5px); /* Definir largura do botão ajustada para compensar o padding do formulário */
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ff9999; /* Cor de fundo mais escura */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Transição suave */
+    margin-top: 10px; /* Adicionar margem superior para separação */
+}
+
+/* Estilizar o botão de envio ao passar o mouse */
+input[type="submit"]:hover {
+    background-color: #ff6666; /* Cor de fundo mais clara */
+}
