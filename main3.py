@@ -86,6 +86,26 @@ class MyHandler(SimpleHTTPRequestHandler):
 
             self.wfile.write(content.encode('utf-8'))
 
+        elif self.path == '/professor':
+            self.send_response(200)
+            self.send_header("Content-type", "text/html; charset=utf-8")
+            self.end_headers()
+
+            with open('professor.html', 'r', encoding='utf-8') as file:
+                content = file.read()
+
+            self.wfile.write(content.encode('utf-8'))
+
+        elif self.path == '/atividadesTurma':
+            self.send_response(200)
+            self.send_header("Content-type", "text/html; charset=utf-8")
+            self.end_headers()
+
+            with open('atv_turmas.html', 'r', encoding='utf-8') as file:
+                content = file.read()
+
+            self.wfile.write(content.encode('utf-8'))
+
         else: 
             super().do_GET()
 
@@ -227,6 +247,41 @@ class MyHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(content.encode('utf-8'))
 
+        elif self.path == '/cad_professor':
+            content_length = int(self.headers['Content-Length'])
+            body = self.rfile.read(content_length).decode('utf-8')
+            form_data = parse_qs(body, keep_blank_values=True)
+
+            login = form_data.get('email', [''])[0]
+            turma = form_data.get('turma', [''])[0]
+
+            with open('dados_login_turma.txt', 'a', encoding='utf-8') as file:
+                file.write(f"{login};{turma}\n")
+
+            with open(os.path.join(os.getcwd(),'resposta.html'),'r',encoding='utf-8')as login_file:
+                    content = login_file.read()
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.wfile.write(content.encode('utf-8'))
+
+        elif self.path == '/atividadesTurma':
+            content_length = int(self.headers['Content-Length'])
+            body = self.rfile.read(content_length).decode('utf-8')
+            form_data = parse_qs(body, keep_blank_values=True)
+
+            turma = form_data.get('turma', [''])[0]
+            atividade = form_data.get('atividade', [''])[0]
+
+            with open('atividades.txt', 'a', encoding='utf-8') as file:
+                file.write(f"{turma};{atividade}\n")
+
+            with open(os.path.join(os.getcwd(),'resposta.html'),'r',encoding='utf-8')as login_file:
+                    content = login_file.read()
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.wfile.write(content.encode('utf-8'))
            
         else:
            super(MyHandler, self).do_POST
