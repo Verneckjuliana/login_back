@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página de Cadastro de Turmas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 600px; /* Adicionando largura para melhor apresentação */
+    }
+
+    .error-message {
+      color: red;
+      margin-bottom: 15px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%; /* Adicionando largura de 100% para ocupar a largura do container */
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    /* Estilos para a tabela */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+      border: 1px solid #ddd; /* Adicionando borda à tabela */
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd; /* Adicionando borda na parte inferior de cada célula */
+    }
+
+    /* Estilos para linhas zebradas */
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    tr:nth-child(odd) {
+      background-color: #ddd;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="error-message">
+      <!-- Mensagem de erro será inserida aqui -->
+
+    </div>
+    <div class="welcome-message">
+
+    </div>
+    Turmas do Professor:
+      <h2>{nome_professor}</h2>
+
+
+
+    <table>
+       <tr>
+          <th>ID</th>
+          <th>Turma</th>
+          <th>Atividades</th>
+       </tr>
+       <tr>
+       <!-- Tabela com linhas zebradas -->
+       </tr>
+    </table>
+    <hr>
+    <form action="/confirmar_turma_professor" method="post">
+
+      <h3>Associar Turmas ao Professor:</h3>
+
+
+      <select id="id_turma" name="id_turma" required>
+      <-- Opções da caixa de seleção serão inseridas aqui -->
+      </select>
+      <br>
+      <br>
+      <input type="hidden" id="id_professor" name="id_professor" value="{id_professor}">
+      <input type="hidden" id="login" name="login" value="{login}">
+
+      <button type="submit">Confirmar Cadastro de Turma</button>
+    </form>
+  </div>
+
+</body>
+<script src="https://kit.fontawesome.com/c9237383f1.js" crossorigin="anonymous"></script>
+</html>

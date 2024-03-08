@@ -119,7 +119,7 @@ class MyHandler(SimpleHTTPRequestHandler):
         cursor.close()
 
         if resultado:
-            senha_hash = hashlib.sha3_256(senha.encode('utf-8')).hexdigest()
+            senha_hash = hashlib.sha256(senha.encode('utf-8')).hexdigest()
             return senha_hash == resultado[0]
         
         return False
@@ -133,13 +133,56 @@ class MyHandler(SimpleHTTPRequestHandler):
         conexao.commit()
 
         cursor.close()
-    
-    def remover_ultima_linha(self, arquivo):
-        print("Vou excluir a ultima linha")
-        with open(arquivo, 'r', encoding='utf-8') as file:
-            lines = file.readlines()
-        with open(arquivo, 'w', encoding='utf-8') as file:
-            file.writelines(lines[:-1])
+
+    def carregar_turmas_professor(self, login):
+        cursor = conexao.cursor()
+        cursor.execute("SELECT id_professor, nome FROM dados_login WHERE login = %s", (login,))
+        resultado = cursor.fetchone()
+        cursor.close()
+
+        id_professor = resultado[0]
+
+        cursor = conexao.cursor()
+        cursor.execute(
+             "SELECT turmas.id_turma, turmas.descricao FROM turmas_professor INNER JOIN turmas ON turmas_professor.id_turma = turmas.id_turma WHERE turmas_professor.id_professor = %s",
+             (id_professor,))
+        turmas = cursor.fetchall()
+        cursor.close()
+        
+        linhas_tabela = " "
+        for turma in turmas:
+            id_turma = turma[0]
+            descricao_turma = turma[1]
+            link_atividade = "<a href='a/atividade_turma?id={}'><i class='fas fa-pencil-alt'></i></a>".format(id_turma)
+            linha = "<tr><td style='text-align:center'>{}</td><td>{}</td><td style='text-align:center'>{}</td></tr>".format(id_turma, descricao_turma, link_atividade)
+            linhas_tabela += linha
+        
+        cursor = conexao.cursor()
+        cursor.execute("SELECT id_turma, descricao FROM turmas")
+        turmas = cursor.fetchall()
+        cursor.close()
+
+        opcoes_caixa_selecao = ""
+        for turma in turmas:
+            opcoes_caixa_selecao += "<option value='{}'>{}</option>".format(turma[0], turma[1])
+        
+        with open(os.path.join(os.getcwd(), 'Turma_professor.html'), "r", encoding='utf-8') as cad_turma_file:
+            content = cad_turma_file.read()
+
+            content = content.replace('{nome_professor}', resultado[1])
+            content = content.replace('{id_professor}', str(id_professor))
+            content = content.replace('{login}', str(login))
+
+            content = content.replace('<!-- Tabela com linhas zeradas -->', linhas_tabela)
+
+            content = content.replace('<-- Opções da caixa de seleção serão inseridas aqui -->', opcoes_caixa_selecao)
+        
+        self.send_response(200)
+        self.send_header("Content-type", "text/html; charset=utf-8")
+        self.end_headers()
+
+        self.wfile.write(content.encode('utf-8'))
+
 
     def do_POST(self):
         if self.path == '/enviar_login':
@@ -151,12 +194,8 @@ class MyHandler(SimpleHTTPRequestHandler):
             senha = form_data.get('senha', [''])[0]
 
             if self.usuario_existente(login, senha):
-                with open(os.path.join(os.getcwd(),'pgresposta.html'),'r',encoding='utf-8')as login_file:
-                    content = login_file.read()
-                self.send_response(200)
-                self.send_header("Content-type", "text/html")
-                self.end_headers()
-                self.wfile.write(content.encode('utf-8'))
+                self.carregar_turmas_professor(login)
+                
             else:
                 cursor = conexao.cursor()
                 cursor.execute("SELECT login FROM dados_login WHERE login = %s", (login,))
@@ -204,11 +243,12 @@ class MyHandler(SimpleHTTPRequestHandler):
             body = self.rfile.read(content_length).decode('utf-8')
             form_data = parse_qs(body, keep_blank_values=True)
 
-            codigo = form_data.get('codigo', [''])[0]
             descricao = form_data.get('descricao', [''])[0]
 
-            with open('dados_turma.txt', 'a', encoding='utf-8') as file:
-                file.write(f"{codigo};{descricao}\n")
+            cursor = conexao.cursor()
+            cursor.execute("INSERT INTO turmas (descricao) VALUES (%s)", (descricao,))
+            conexao.commit()
+            cursor.close()
 
             with open(os.path.join(os.getcwd(),'resposta.html'),'r',encoding='utf-8')as login_file:
                     content = login_file.read()
@@ -223,11 +263,12 @@ class MyHandler(SimpleHTTPRequestHandler):
             body = self.rfile.read(content_length).decode('utf-8')
             form_data = parse_qs(body, keep_blank_values=True)
 
-            codigo = form_data.get('codigo', [''])[0]
-            descricao = form_data.get('descricao', [''])[0]
+            descricao_atv = form_data.get('descricao_atv', [''])[0]
 
-            with open('dados_atividade.txt', 'a', encoding='utf-8') as file:
-                file.write(f"{codigo};{descricao}\n")
+            cursor = conexao.cursor()
+            cursor.execute("INSERT INTO turmas (descricao) VALUES (%s)", (descricao_atv,))
+            conexao.commit()
+            cursor.close()
 
             with open(os.path.join(os.getcwd(),'resposta.html'),'r',encoding='utf-8')as login_file:
                     content = login_file.read()
@@ -244,8 +285,10 @@ class MyHandler(SimpleHTTPRequestHandler):
             login = form_data.get('email', [''])[0]
             turma = form_data.get('turma', [''])[0]
 
-            with open('dados_login_turma.txt', 'a', encoding='utf-8') as file:
-                file.write(f"{login};{turma}\n")
+            cursor = conexao.cursor()
+            cursor.execute("INSERT INTO turmas (turma) VALUES (%s)", (turma,))
+            conexao.commit()
+            cursor.close()
 
             with open(os.path.join(os.getcwd(),'resposta.html'),'r',encoding='utf-8')as login_file:
                     content = login_file.read()
@@ -262,8 +305,10 @@ class MyHandler(SimpleHTTPRequestHandler):
             turma = form_data.get('turma', [''])[0]
             atividade = form_data.get('atividade', [''])[0]
 
-            with open('atividades.txt', 'a', encoding='utf-8') as file:
-                file.write(f"{turma};{atividade}\n")
+            cursor = conexao.cursor()
+            cursor.execute("INSERT INTO turmas (atividade) VALUES (%s)", (atividade,))
+            conexao.commit()
+            cursor.close()
 
             with open(os.path.join(os.getcwd(),'resposta.html'),'r',encoding='utf-8')as login_file:
                     content = login_file.read()
